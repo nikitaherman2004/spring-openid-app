@@ -11,14 +11,18 @@ import java.util.Optional;
 public class CookieTokenResolver implements TokenResolver {
 
     @Value("${cookie.access-session.name}")
-    private String accessSessionCookie;
+    private String accessTokenCookieName;
 
     @Override
     public Optional<String> resolve(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
 
+        if (cookies == null) {
+            return Optional.empty();
+        }
+
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(accessSessionCookie)) {
+            if (cookie.getName().equals(accessTokenCookieName)) {
                 return Optional.of(cookie.getValue());
             }
         }

@@ -1,8 +1,6 @@
 package com.open_id.backend.configuration.security;
 
 import com.open_id.backend.filter.SecurityAuthFilter;
-import com.open_id.backend.handler.OidcLogoutSuccessHandler;
-import com.open_id.backend.handler.SetAuthenticationAttributeLogoutHandler;
 import com.open_id.backend.service.auth.OidcSecurityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
@@ -27,16 +26,17 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SecurityFilterChainConfiguration {
 
-    @Value("${post-logout-redirect-uri}")
-    private String redirectUri;
+    private static final String JSESSIONID_COOKIE = "JSESSIONID";
 
-    private final OidcSecurityService OidcSecurityService;
+    @Value("${post-logout-redirect-uri}")
+    private String redirectSuccessUri;
+
+    @Value("${cookie.access-session.name}")
+    private String xAuthCookie;
 
     private final SecurityAuthFilter securityAuthFilter;
 
-    private final OidcLogoutSuccessHandler oidcLogoutSuccessHandler;
-
-    private final SetAuthenticationAttributeLogoutHandler setAuthenticationAttributeLogoutHandler;
+    private final OidcSecurityService OidcSecurityService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,11 +52,12 @@ public class SecurityFilterChainConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         .sessionFixation().migrateSession()
                         .sessionAuthenticationStrategy(OidcSecurityService))
-                .logout(configurer -> configurer
-                        .addLogoutHandler(setAuthenticationAttributeLogoutHandler)
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler)
-                        .logoutSuccessUrl("/logout")
+                .oidcLogout((logout) -> logout
+                        .backChannel(Customizer.withDefaults())
                 )
+                .logout((configurer) -> configurer
+                        .deleteCookies(JSESSIONID_COOKIE, xAuthCookie)
+                        .invalidateHttpSession(true))
                 .addFilterAfter(securityAuthFilter, SecurityContextHolderFilter.class);
 
         return httpSecurity.build();
@@ -76,6 +77,6 @@ public class SecurityFilterChainConfiguration {
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException {
-        response.sendRedirect(redirectUri);
+        response.sendRedirect(redirectSuccessUri);
     }
 }

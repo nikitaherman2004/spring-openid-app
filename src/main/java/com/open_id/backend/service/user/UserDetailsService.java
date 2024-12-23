@@ -16,22 +16,28 @@ public class UserDetailsService {
 
     private final UserDetailsRepository userDetailsRepository;
 
-    public UserDetails findDetailsById(Long id) {
+    public void saveUserDetails(UserDetails userDetails) {
+        userDetailsRepository.save(userDetails);
+    }
+
+    public UserDetails findUserDetailsById(Long id) {
         Optional<UserDetails> optional = userDetailsRepository.findById(id);
 
         if (optional.isPresent()) {
             return optional.get();
         } else {
-            throw new ApplicationException("Не удалось найти аккаунт пользователя", HttpStatus.NOT_FOUND);
+            throw new ApplicationException(
+                    String.format("Не удалось найти Информацию о пользователю по id - %d", id),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
     public void updateUserDetails(UserDetailsUpdateDto updateDto) {
-        UserDetails userDetails = findDetailsById(updateDto.getId());
+        UserDetails userDetails = findUserDetailsById(updateDto.getId());
 
         userDetails.setCity(updateDto.getCity());
         userDetails.setAboutYourself(updateDto.getAboutYourself());
 
-        userDetailsRepository.save(userDetails);
+        saveUserDetails(userDetails);
     }
 }

@@ -11,13 +11,13 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuth2AuthorizedClientDTO {
+public class RedisOAuth2AuthorizedClient {
 
     private String principalName;
 
     private RedisAccessToken accessToken;
 
-    private OAuth2RefreshTokenDTO refreshToken;
+    private RedisRefreshToken refreshToken;
 
     @JsonIgnore
     private ClientRegistration clientRegistration;

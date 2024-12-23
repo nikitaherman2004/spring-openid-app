@@ -15,13 +15,13 @@ public class OAuth2AccessTokenMapper {
         );
     }
 
-    public OAuth2AccessToken toEntity(RedisAccessToken accessTokenDTO) {
+    public OAuth2AccessToken toEntity(RedisAccessToken redisAccessToken) {
         return new OAuth2AccessToken(
                 OAuth2AccessToken.TokenType.BEARER,
-                accessTokenDTO.getTokenValue(),
-                accessTokenDTO.getIssuedAt(),
-                accessTokenDTO.getExpiresAt(),
-                accessTokenDTO.getScopes()
+                redisAccessToken.getTokenValue(),
+                redisAccessToken.getIssuedAt(),
+                redisAccessToken.getExpiresAt(),
+                redisAccessToken.getScopes()
         );
     }
 }

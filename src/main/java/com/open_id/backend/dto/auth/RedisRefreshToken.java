@@ -11,7 +11,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuth2RefreshTokenDTO {
+public class RedisRefreshToken {
 
     private Instant issuedAt;
 

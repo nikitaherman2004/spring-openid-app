@@ -3,7 +3,7 @@ package com.open_id.backend.configuration.redis;
 import com.open_id.backend.configuration.redis.serializer.OAuth2AccessTokenSerializer;
 import com.open_id.backend.configuration.redis.serializer.Oauth2AuthorizedClientIdSerializer;
 import com.open_id.backend.configuration.redis.serializer.Oauth2AuthorizedClientRedisSerializer;
-import com.open_id.backend.dto.auth.OAuth2AuthorizedClientDTO;
+import com.open_id.backend.dto.auth.RedisOAuth2AuthorizedClient;
 import com.open_id.backend.dto.auth.RedisAccessToken;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -55,8 +55,8 @@ public class RedisTemplateConfiguration {
     }
 
     @Bean
-    public RedisTemplate<OAuth2AuthorizedClientId, OAuth2AuthorizedClientDTO> configureAuthClientsRedisTemplate() {
-        RedisTemplate<OAuth2AuthorizedClientId, OAuth2AuthorizedClientDTO> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<OAuth2AuthorizedClientId, RedisOAuth2AuthorizedClient> configureAuthClientsRedisTemplate() {
+        RedisTemplate<OAuth2AuthorizedClientId, RedisOAuth2AuthorizedClient> redisTemplate = new RedisTemplate<>();
 
         redisTemplate.setKeySerializer(oauth2AuthorizedClientIdSerializer);
         redisTemplate.setValueSerializer(oauth2AuthorizedClientRedisSerializer);

@@ -15,7 +15,7 @@ public class UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
 
-    public UserRole getUserRoleByName(String name) {
+    public UserRole findUserRoleByName(String name) {
         Optional<UserRole> optional = userRoleRepository.findByName(name);
 
         if (optional.isPresent()) {
@@ -28,7 +28,7 @@ public class UserRoleService {
         }
     }
 
-    public String getUserRoleBySub(String sub) {
+    public String findUserRoleBySub(String sub) {
         Optional<UserRole> optional = userRoleRepository.findByUser_Sub(sub);
 
         if (optional.isPresent()) {

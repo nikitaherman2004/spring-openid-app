@@ -15,7 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -30,9 +31,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -106,8 +105,7 @@ public class SecurityAuthFilter extends OncePerRequestFilter {
 
         Authentication authenticationResult = verifyAccessTokenAndAuthenticate(accessTokenValue);
 
-        SecurityContext securityContext = securityContextHolderStrategy.getContext();
-        securityContext.setAuthentication(authenticationResult);
+        SecurityContextHolder.getContext().setAuthentication(authenticationResult);
     }
 
     private Authentication verifyAccessTokenAndAuthenticate(String accessTokenValue) {
@@ -134,6 +132,7 @@ public class SecurityAuthFilter extends OncePerRequestFilter {
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(
                 filterConfiguration.getClientRegistrationId()
         );
+
         if (clientRegistration == null) {
             log.error(
                     "The client registration for the provider could not be found in the repository, " +
@@ -146,13 +145,22 @@ public class SecurityAuthFilter extends OncePerRequestFilter {
 
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
 
+        String roleName = userRoleService.findUserRoleBySub(sub);
+
         return new OidcAuthenticationToken(
                 oAuth2User,
-                oAuth2User.getAuthorities(),
+                createUserGrantedAuthorities(sub),
                 clientRegistration.getRegistrationId(),
                 sub,
-                userRoleService.getUserRoleBySub(sub)
+                roleName
         );
+    }
+
+    private Set<? extends GrantedAuthority> createUserGrantedAuthorities(String roleName) {
+        Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
+        grantedAuthorities.add(new SimpleGrantedAuthority(roleName));
+
+        return grantedAuthorities;
     }
 
     private String resolveAccessToken(HttpServletRequest request) {

@@ -20,6 +20,10 @@ public class RedisOidcIdTokenService {
 
     private final RedisAccessTokenRepository accessTokenRepository;
 
+    public Optional<RedisAccessToken> getAccessToken(String key) {
+        return accessTokenRepository.getAccessToken(key);
+    }
+
     public void saveAccessToken(String sub, OAuth2AccessToken accessToken) {
         String key = getKey(sub, accessToken.getTokenValue());
 
@@ -30,14 +34,19 @@ public class RedisOidcIdTokenService {
 
     public OAuth2AccessToken getAccessToken(String sub, String tokenValue) {
         String key = getKey(sub, tokenValue);
-        Optional<RedisAccessToken> optional = accessTokenRepository.getAccessToken(key);
+        Optional<RedisAccessToken> optional = getAccessToken(key);
 
         if (optional.isPresent()) {
             RedisAccessToken redisAccessToken = optional.get();
 
             return oAuth2AccessTokenMapper.toEntity(redisAccessToken);
         } else {
-            throw new AccessDeniedException("The access token could not be found in the cache storage");
+            throw new AccessDeniedException(
+                    String.format(
+                            "Couldn't find access token by prefix %s and token value %s",
+                            sub,
+                            tokenValue
+            ));
         }
     }
 
