@@ -30,11 +30,11 @@ import static com.open_id.backend.util.CookieUtils.createCookie;
 @RequiredArgsConstructor
 public class OidcSecurityService implements SessionAuthenticationStrategy {
 
-    @Value("${cookie.access-session.name}")
-    private String accessTokenCookieName;
-
     @Value("${cookie.access-session.max-age-in-seconds}")
     private Integer cookieMaxAge;
+
+    @Value("${cookie.access-session.name}")
+    private String accessTokenCookieName;
 
     private final AppUserService appUserService;
 

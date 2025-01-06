@@ -40,6 +40,10 @@ public class AppUserService {
 
     private final OAuth2UserAttributeAccessor attributeAccessor;
 
+    public Boolean existsByUserSub(String sub) {
+        return appUserRepository.existsById(sub);
+    }
+
     public void saveNewAppUser(AppUser storedUser) {
         appUserRepository.save(storedUser);
     }

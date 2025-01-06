@@ -6,10 +6,7 @@ import com.open_id.backend.service.user.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +18,11 @@ public class UserController {
     @GetMapping("/current")
     public AppUserResponseDto getCurrentAppUser() {
         return appUserService.getCurrentAppUser();
+    }
+
+    @GetMapping("/exists")
+    public Boolean existsByUserSub(@RequestParam String sub) {
+        return appUserService.existsByUserSub(sub);
     }
 
     @GetMapping
